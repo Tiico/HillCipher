@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b7662999-83fc-4eb4-895c-4b246f8a7474" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../HW5/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../HW5/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AssignmentIncludes/tempPlainNumber.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/HillCipher/HillCipher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/HillCipher/HillCipher.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/HillCipher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/HillCipher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt" beforeDir="false" afterPath="$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,26 +29,26 @@
           <entry key="hilldecode" value="3" />
           <entry key="hillencode" value="3" />
           <entry key="java" value="1" />
-          <entry key="txt" value="62" />
+          <entry key="txt" value="63" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="JAVA" value="1" />
-          <entry key="PLAIN_TEXT" value="70" />
+          <entry key="PLAIN_TEXT" value="71" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="11" />
           <entry key="gitignore" value="23" />
-          <entry key="java" value="7374" />
+          <entry key="java" value="7375" />
           <entry key="txt" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="7374" />
+          <entry key="JAVA" value="7375" />
           <entry key="PLAIN_TEXT" value="36" />
         </counts>
       </usages-collector>
@@ -62,8 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/HillCipher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="38" column="52" selection-start-line="38" selection-start-column="52" selection-end-line="38" selection-end-column="52" />
+            <state relative-caret-position="85">
+              <caret line="39" column="45" lean-forward="true" selection-start-line="39" selection-start-column="45" selection-end-line="39" selection-end-column="45" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -71,13 +68,18 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
-              <caret line="1" column="7" lean-forward="true" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
+              <caret line="1" column="7" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -102,9 +104,9 @@
         <option value="$PROJECT_DIR$/AssignmentIncludes/cipher-alpha-me.txt" />
         <option value="$PROJECT_DIR$/AssignmentIncludes/tempPlainNumber.txt" />
         <option value="$PROJECT_DIR$/AssignmentIncludes/plain-alpha.txt" />
-        <option value="$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt" />
-        <option value="$PROJECT_DIR$/src/HillCipher.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/HillCipher.java" />
+        <option value="$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt" />
       </list>
     </option>
   </component>
@@ -154,7 +156,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553583228080" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553583555768" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -203,12 +205,12 @@
       <option name="presentableId" value="Default" />
       <updated>1553089846247</updated>
       <workItem from="1553089849061" duration="43381000" />
-      <workItem from="1553510970116" duration="9740000" />
+      <workItem from="1553510970116" duration="9908000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53121000" />
+    <option name="totallyTimeSpent" value="53289000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="1513" height="973" extended-state="6" />
@@ -301,25 +303,25 @@
     <entry file="file://$PROJECT_DIR$/AssignmentIncludes/plain-alpha.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="7" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/HillCipher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="38" column="52" selection-start-line="38" selection-start-column="52" selection-end-line="38" selection-end-column="52" />
+        <state relative-caret-position="85">
+          <caret line="39" column="45" lean-forward="true" selection-start-line="39" selection-start-column="45" selection-end-line="39" selection-end-column="45" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="7" lean-forward="true" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/AssignmentIncludes/cipher-alpha.txt">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>
