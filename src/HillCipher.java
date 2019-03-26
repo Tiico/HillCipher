@@ -35,20 +35,15 @@ public class HillCipher {
                 System.err.println("Incorrect argument format, usage should be <Integer> <Integer> <Key file name> <Text file name> <Ciphertext file name>");
                 System.exit(1);
             }
-            File tempPlainNumber = new File("AssignmentIncludes/tempPlainNumber.txt");
 
-        try {
-            String params = "--coding=alpha" + " " + plainText + " " + tempPlainNumber;
-            Runtime.getRuntime().exec("python AssignmentIncludes/hillencode" + " " + params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        encrypt(keyFile, cipherText, tempPlainNumber);
-        decrypt(cipherText, plainText);
+            encrypt(keyFile, cipherText, plainText);
+            //decrypt(cipherText, plainText);
     }
 
-    private static void encrypt(File key, File cipherText, File plainNumber){
-        Object[] arr = readFromFile(plainNumber);
+    private static void encrypt(File key, File cipherText, File plainText){
+        File tempPlainNumber = new File("AssignmentIncludes/tempPlainNumber.txt");
+        encode(plainText, tempPlainNumber);
+        Object[] arr = readFromFile(tempPlainNumber);
         int[][] plainNumbers = createReverseMatrix(arr, 3, 4);
 
         Object[] keyList = readFromFile(key);
@@ -60,25 +55,24 @@ public class HillCipher {
         File tempCipherNumber = new File("AssignmentIncludes/tempCipherNumber.txt");
         writeToFile(product, tempCipherNumber.toPath().toString());
 
-        try {
-            String params = "--coding=alpha" + " " + tempCipherNumber + " " + cipherText;
-            Process p = Runtime.getRuntime().exec("python AssignmentIncludes/hilldecode" + " " + params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        decode(tempCipherNumber, cipherText);
 
+    }
     private static void decrypt(File source, File dest){
         File invKey = new File("AssignmentIncludes/invkey3-26.txt");
         Object[] key = readFromFile(invKey);
         int[][] invKeyMatrix = createMatrix(key, 3, 3);
-        printMatrix(invKeyMatrix);
 
-        //Needs to convert source from alpha to numeric, should add own function to use throughout project.
-        System.out.println(source.toPath().toString());
-        Object[] arr = readFromFile(source);
-        int[][] cipherText = createMatrix(arr, 3, 4);
-        printMatrix(cipherText);
+        File numeric = new File("AssignmentIncludes/cipher-number.txt");
+        File tempPlainNumber = new File("AssignmentIncludes/plainTemp.txt");
+        encode(source, numeric);
+        Object[] arr = readFromFile(numeric);
+        int[][] cipherText = createReverseMatrix(arr, 3, 4);
+        int[][] plainNumeric = multiplyMatrices(invKeyMatrix, cipherText, 3, 3, 4);
+
+        System.out.println("dest: " + tempPlainNumber.toPath().toString());
+        writeToFile(plainNumeric, tempPlainNumber.toPath().toString());
+        decode(tempPlainNumber, dest);
     }
     private static int[][] multiplyMatrices(int[][] first, int[][] second, int row1, int col1, int col2){
         int[][] product = new int[row1][col2];
@@ -86,6 +80,7 @@ public class HillCipher {
             for (int j = 0; j < col2; j++) {
                 for (int k = 0; k < col1; k++) {
                     product[i][j] += first[i][k] * second[k][j];
+                    product[i][j] = product[i][j] % 26;
                 }
             }
         }
@@ -147,6 +142,22 @@ public class HillCipher {
                 }
             }
             out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private  static void decode(File source, File dest){
+        try {
+            String params = "--coding=alpha" + " " + source + " " + dest;
+            Process p = Runtime.getRuntime().exec("python AssignmentIncludes/hilldecode" + " " + params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private  static void encode(File source, File dest){
+        try {
+            String params = "--coding=alpha" + " " + source + " " + dest;
+            Runtime.getRuntime().exec("python AssignmentIncludes/hillencode" + " " + params);
         } catch (IOException e) {
             e.printStackTrace();
         }
