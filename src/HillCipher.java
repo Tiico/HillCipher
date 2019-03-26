@@ -32,7 +32,7 @@ public class HillCipher {
                     throw new NumberFormatException("error");
                 }
             } catch (NumberFormatException e) {
-                System.err.println("Incorrect argument format, usage should be <Integer> <Integer> <Key file name> <Text file name> <Ciphertext file name>");
+                System.err.println("Incorrect argument format, usage should be <int radix> <int blocksize> <Key file name> <Text file name> <Ciphertext file name>");
                 System.exit(1);
             }
 
@@ -41,41 +41,48 @@ public class HillCipher {
     }
 
     private static void encrypt(File key, File cipherText, File plainText){
-        File tempPlainNumber = new File("AssignmentIncludes/tempPlainNumber.txt");
+        File tempPlainNumber = new File("../AssignmentIncludes/tempPlainNumber.txt");
         encode(plainText, tempPlainNumber);
         Object[] arr = readFromFile(tempPlainNumber);
-        int[][] plainNumbers = createReverseMatrix(arr, 3, 4);
+        int[][] plainNumbers = createReverseMatrix(arr);
+        printMatrix(plainNumbers);
 
         Object[] keyList = readFromFile(key);
-        int[][] keyMatrix = createMatrix(keyList, 3, 3);
+        int[][] keyMatrix = createMatrix(keyList);
+        printMatrix(keyMatrix);
 
         int[][] product = multiplyMatrices(keyMatrix, plainNumbers , 3, 3, 4);
+
         printMatrix(product);
 
-        File tempCipherNumber = new File("AssignmentIncludes/tempCipherNumber.txt");
+        File tempCipherNumber = new File("../AssignmentIncludes/tempCipherNumber.txt");
         writeToFile(product, tempCipherNumber.toPath().toString());
 
         decode(tempCipherNumber, cipherText);
 
     }
     private static void decrypt(File source, File dest){
-        File invKey = new File("AssignmentIncludes/invkey3-26.txt");
+        File invKey = new File("../AssignmentIncludes/invkey3-26.txt");
         Object[] key = readFromFile(invKey);
-        int[][] invKeyMatrix = createMatrix(key, 3, 3);
+        int[][] invKeyMatrix = createMatrix(key);
 
-        File numeric = new File("AssignmentIncludes/cipher-number.txt");
-        File tempPlainNumber = new File("AssignmentIncludes/plainTemp.txt");
+        File numeric = new File("../AssignmentIncludes/cipher-number.txt");
+        File tempPlainNumber = new File("../AssignmentIncludes/plainTemp.txt");
         encode(source, numeric);
         Object[] arr = readFromFile(numeric);
-        int[][] cipherText = createReverseMatrix(arr, 3, 4);
+        int[][] cipherText = createReverseMatrix(arr);
         int[][] plainNumeric = multiplyMatrices(invKeyMatrix, cipherText, 3, 3, 4);
 
-        System.out.println("dest: " + tempPlainNumber.toPath().toString());
         writeToFile(plainNumeric, tempPlainNumber.toPath().toString());
         decode(tempPlainNumber, dest);
     }
     private static int[][] multiplyMatrices(int[][] first, int[][] second, int row1, int col1, int col2){
-        int[][] product = new int[row1][col2];
+        int[][] product = new int[first.length][second[0].length];
+        row1 = first.length;
+        col1 = first[0].length;
+        col2 = second[0].length;
+
+
         for(int i = 0; i < row1; i++) {
             for (int j = 0; j < col2; j++) {
                 for (int k = 0; k < col1; k++) {
@@ -86,8 +93,10 @@ public class HillCipher {
         }
         return product;
     }
-    private static int[][] createReverseMatrix(Object[] arr, int row, int col){
+    private static int[][] createReverseMatrix(Object[] arr){
         int k = 0;
+        int row = 3;
+        int col = arr.length / row;
         int[][] result = new int[row][col];
         for (int i = 0; i < col; i++){
             for (int j = 0; j < row; j++){
@@ -101,8 +110,10 @@ public class HillCipher {
         System.out.println();
         return result;
     }
-    private static int[][] createMatrix(Object[] arr, int row, int col){
+    private static int[][] createMatrix(Object[] arr){
         int k = 0;
+        int row = 3;
+        int col = arr.length / row;
         int[][] result = new int[row][col];
         for (int i = 0; i < row; i++){
             for (int j = 0; j < col; j++){
@@ -149,7 +160,7 @@ public class HillCipher {
     private  static void decode(File source, File dest){
         try {
             String params = "--coding=alpha" + " " + source + " " + dest;
-            Process p = Runtime.getRuntime().exec("python AssignmentIncludes/hilldecode" + " " + params);
+            Process p = Runtime.getRuntime().exec("python ../AssignmentIncludes/hilldecode" + " " + params);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -157,7 +168,7 @@ public class HillCipher {
     private  static void encode(File source, File dest){
         try {
             String params = "--coding=alpha" + " " + source + " " + dest;
-            Runtime.getRuntime().exec("python AssignmentIncludes/hillencode" + " " + params);
+            Runtime.getRuntime().exec("python ../AssignmentIncludes/hillencode" + " " + params);
         } catch (IOException e) {
             e.printStackTrace();
         }
