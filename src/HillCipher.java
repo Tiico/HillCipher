@@ -1,3 +1,6 @@
+import Exceptions.FileAccessException;
+import Exceptions.InvalidNumberException;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -6,43 +9,21 @@ public class HillCipher {
 
     public static void main(String[] args) {
         System.out.println("Welcome to the hillcipher");
-        int radix, blockSize;
-        File keyFile, plainText, cipherText;
-        keyFile = plainText = cipherText = null;
-            try {
-                if (args.length > 0 && args.length <= 5) {
-                    radix = Integer.parseInt(args[0]);
-                    if (radix != 26){
-                        System.err.println("radix has to be 26");
-                        System.exit(1);
-                    }
-                    blockSize = Integer.parseInt(args[1]);
-                    if (blockSize != 3){
-                        System.err.println("blocksize must be 3");
-                        System.exit(1);
-                    }
-                    keyFile = new File(args[2]);
-                    plainText = new File(args[3]);
-                    cipherText = new File(args[4]);
-                    if (!keyFile.isFile() || !plainText.isFile()){
-                        System.err.println("A file specified does not exits");
-                        System.exit(1);
-                    }
-                }else{
-                    throw new NumberFormatException("error");
-                }
-            } catch (NumberFormatException e) {
-                System.err.println("Incorrect argument format, usage should be <int radix> <int blocksize> <Key file name> <Text file name> <Ciphertext file name>");
-                System.exit(1);
-            }
+        try {
+            CipherValidator.validate(args);
+        } catch (InvalidNumberException | IllegalArgumentException | FileAccessException e) {
+            System.out.println("Runtime error! " + e.getMessage());
+        }
+        final int radix = Integer.parseInt(args[0]);
+        final int blockSize = Integer.parseInt(args[1]);
+        final File keyFile = new File(args[2]);
+        final File plainText = new File(args[3]);
+        final File cipherText = new File(args[4]);
 
-            encrypt(keyFile, cipherText, plainText);
-            //decrypt(cipherText, plainText);
+        encrypt(keyFile, plainText, cipherText);
     }
-    public static void encrypt(File key, File cipherText, File plainText){
-        File tempPlainNumber = new File("AssignmentIncludes/tempPlainNumber.txt");
-        encode(plainText, tempPlainNumber);
-        Object[] arr = readFromFile(tempPlainNumber);
+    public static void encrypt(File key, File source, File dest){
+        Object[] arr = readFromFile(source);
         int[][] plainNumbers = createReverseMatrix(arr);
         printMatrix(plainNumbers);
 
@@ -54,26 +35,7 @@ public class HillCipher {
 
         printMatrix(product);
 
-        File tempCipherNumber = new File("AssignmentIncludes/tempCipherNumber.txt");
-        writeToFile(product, tempCipherNumber.toPath().toString());
-
-        decode(tempCipherNumber, cipherText);
-
-    }
-    public static void decrypt(File source, File dest){
-        File invKey = new File("AssignmentIncludes/invkey3-26.txt");
-        Object[] key = readFromFile(invKey);
-        int[][] invKeyMatrix = createMatrix(key);
-
-        File numeric = new File("AssignmentIncludes/cipher-number.txt");
-        File tempPlainNumber = new File("AssignmentIncludes/plainTemp.txt");
-        encode(source, numeric);
-        Object[] arr = readFromFile(numeric);
-        int[][] cipherText = createReverseMatrix(arr);
-        int[][] plainNumeric = multiplyMatrices(invKeyMatrix, cipherText);
-
-        writeToFile(plainNumeric, tempPlainNumber.toPath().toString());
-        decode(tempPlainNumber, dest);
+        writeToFile(product, dest.toPath().toString());
     }
     public static int[][] multiplyMatrices(int[][] first, int[][] second){
         int[][] product = new int[first.length][second[0].length];
@@ -152,22 +114,6 @@ public class HillCipher {
                 }
             }
             out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public   static void decode(File source, File dest){
-        try {
-            String params = "--coding=alpha" + " " + source + " " + dest;
-            Process p = Runtime.getRuntime().exec("python AssignmentIncludes/hilldecode" + " " + params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public   static void encode(File source, File dest){
-        try {
-            String params = "--coding=alpha" + " " + source + " " + dest;
-            Runtime.getRuntime().exec("python AssignmentIncludes/hillencode" + " " + params);
         } catch (IOException e) {
             e.printStackTrace();
         }

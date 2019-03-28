@@ -1,3 +1,5 @@
+import Exceptions.FileAccessException;
+import Exceptions.InvalidNumberException;
 import org.jscience.mathematics.number.Float64;
 import org.jscience.mathematics.vector.Float64Matrix;
 import org.jscience.mathematics.vector.Float64Vector;
@@ -10,56 +12,36 @@ import java.util.Scanner;
 public class HillDecipher {
     public static void main(String[] args) {
         System.out.println("Welcome to the HillDecipher");
-        int radix, blockSize;
-        File keyFile, plainText, cipherText;
-        keyFile = plainText = cipherText = null;
+
         try {
-            if (args.length > 0 && args.length <= 5) {
-                radix = Integer.parseInt(args[0]);
-                if (radix != 26){
-                    System.err.println("radix has to be 26");
-                    System.exit(1);
-                }
-                blockSize = Integer.parseInt(args[1]);
-                if (blockSize != 3){
-                    System.err.println("blocksize must be 3");
-                    System.exit(1);
-                }
-                keyFile = new File(args[2]);
-                plainText = new File(args[3]);
-                cipherText = new File(args[4]);
-                if (!keyFile.isFile() || !plainText.isFile()){
-                    System.err.println("A file specified does not exits");
-                    System.exit(1);
-                }
-            }else{
-                throw new NumberFormatException("error");
-            }
-        } catch (NumberFormatException e) {
-            System.err.println("Incorrect argument format, usage should be <int radix> <int blocksize> <Key file name> <Text file name> <Ciphertext file name>");
-            System.exit(1);
+            DecipherValidator.validate(args);
+        } catch (InvalidNumberException | FileAccessException | IllegalArgumentException e) {
+            System.out.println("Runtime error! " + e.getMessage());
         }
+
+        final int radix = Integer.parseInt(args[0]);
+        final int blockSize = Integer.parseInt(args[1]);
+        final File keyFile = new File(args[2]);
+        final File plainText = new File(args[3]);
+        final File cipherText = new File(args[4]);
+
         decrypt(keyFile, cipherText, plainText);
     }
 
-    public static void decrypt(File keyfile, File source, File dest){
-        Object[] key = readFromFile(keyfile);
+    public static void decrypt(File keyFile, File source, File dest){
+        Object[] key = readFromFile(keyFile);
         int[][] keyMatrix = createMatrix(key);
-        printMatrix(keyMatrix);
         int[][] invertedMatrix = invertMatrix(keyMatrix);
-        printMatrix(invertedMatrix);
 
-        File numeric = new File("AssignmentIncludes/cipher-number.txt");
-        File tempPlainNumber = new File("AssignmentIncludes/plainTemp.txt");
-        encode(source, numeric);
-        Object[] numericArr = readFromFile(numeric);
+        printMatrix(invertedMatrix, "Inverted matrix");
+
+        Object[] numericArr = readFromFile(source);
         int[][] cipherText = createReverseMatrix(numericArr);
-        printMatrix(cipherText);
+        printMatrix(cipherText, "cipherText");
         int[][] plainNumeric = multiplyMatrices(invertedMatrix, cipherText);
-        printMatrix(plainNumeric);
+        printMatrix(plainNumeric, "plainNumeric");
 
-        writeToFile(plainNumeric, tempPlainNumber.toPath().toString());
-        decode(tempPlainNumber, dest);
+        writeToFile(plainNumeric, dest.toPath().toString());
     }
 
     private static int[][] invertMatrix(int[][] matrix){
@@ -80,6 +62,7 @@ public class HillDecipher {
 
         Float64Matrix keyMatrix = Float64Matrix.valueOf(vectors);
 
+
         long det = Math.floorMod(keyMatrix.determinant().longValue(), 26);
         int detInv = modInverse((int) det, 26);
         Float64Matrix adjMatrix = matrixMod(keyMatrix.adjoint(), 26);
@@ -97,8 +80,6 @@ public class HillDecipher {
         return returnMatrix;
     }
     // A naive method to find modulo
-    // multiplicative inverse of 'a'
-    // under modulo 'm'
     private static int modInverse(int a, int m){
         a = a % m;
         for (int x = 1; x < m; x++)
@@ -201,27 +182,8 @@ public class HillDecipher {
         }
         return product;
     }
-
-
-
-    public   static void decode(File source, File dest){
-        try {
-            String params = "--coding=alpha" + " " + source + " " + dest;
-            Process p = Runtime.getRuntime().exec("python AssignmentIncludes/hilldecode" + " " + params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public   static void encode(File source, File dest){
-        try {
-            String params = "--coding=alpha" + " " + source + " " + dest;
-            Runtime.getRuntime().exec("python AssignmentIncludes/hillencode" + " " + params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public static void printMatrix(int[][] matrix){
-        System.out.println("*==============*");
+    public static void printMatrix(int[][] matrix, String name){
+        System.out.println("*====" + name + "====*");
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix[i].length; j++){
                 if (i >= 0 && i < matrix.length && j >= 0 && j < matrix[i].length) {
