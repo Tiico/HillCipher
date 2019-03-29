@@ -13,6 +13,7 @@ public class HillCipher {
             CipherValidator.validate(args);
         } catch (InvalidNumberException | IllegalArgumentException | FileAccessException e) {
             System.out.println("Runtime error! " + e.getMessage());
+            System.exit(1);
         }
         final int radix = Integer.parseInt(args[0]);
         final int blockSize = Integer.parseInt(args[1]);
@@ -25,15 +26,15 @@ public class HillCipher {
     public static void encrypt(File key, File source, File dest){
         Object[] arr = readFromFile(source);
         int[][] plainNumbers = createReverseMatrix(arr);
-        printMatrix(plainNumbers);
+        printMatrix(plainNumbers, "plainNumbers");
 
         Object[] keyList = readFromFile(key);
         int[][] keyMatrix = createMatrix(keyList);
-        printMatrix(keyMatrix);
+        printMatrix(keyMatrix, "keyMatrix");
 
         int[][] product = multiplyMatrices(keyMatrix, plainNumbers);
 
-        printMatrix(product);
+        printMatrix(product, "product");
 
         writeToFile(product, dest.toPath().toString());
     }
@@ -118,7 +119,8 @@ public class HillCipher {
             e.printStackTrace();
         }
     }
-    public static void printMatrix(int[][] matrix){
+    public static void printMatrix(int[][] matrix, String name){
+        System.out.println("*====" + name + "====*");
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix[i].length; j++){
                 if (i >= 0 && i < matrix.length && j >= 0 && j < matrix[i].length) {
@@ -127,5 +129,6 @@ public class HillCipher {
             }
             System.out.println();
         }
+        System.out.println("*==============*");
     }
 }

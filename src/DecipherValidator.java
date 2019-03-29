@@ -1,10 +1,8 @@
-import Exceptions.DeniedAccessException;
-import Exceptions.FileAccessException;
-import Exceptions.InvalidNumberException;
-import Exceptions.OutOfRangeException;
+import Exceptions.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class DecipherValidator {
     public static void validate(String[] args) throws InvalidNumberException, IllegalArgumentException, FileAccessException {
@@ -37,8 +35,9 @@ public class DecipherValidator {
                 if (!key.canRead()){
                     throw new DeniedAccessException("Unable to access file properly");
                 }
+                validateFile(key);
 
-            }catch (FileNotFoundException | DeniedAccessException e){
+            }catch (FileNotFoundException | DeniedAccessException | InvalidFileFormatException e){
                 throw new FileAccessException("Unable to handle file: \"" + args[2] + "\", " + e.getMessage());
             }
 
@@ -51,8 +50,9 @@ public class DecipherValidator {
                 if (!plainFile.canRead()){
                     throw new DeniedAccessException("Unable to access file properly");
                 }
+                validateFile(plainFile);
 
-            }catch (FileNotFoundException | DeniedAccessException e){
+            }catch (FileNotFoundException | DeniedAccessException | InvalidFileFormatException e){
                 throw new FileAccessException("Unable to handle file: \"" + args[3] + "\", " + e.getMessage());
             }
             //CipherFile
@@ -64,8 +64,9 @@ public class DecipherValidator {
                 if (!cipherFile.canWrite()){
                     throw new DeniedAccessException("Unable to access file properly");
                 }
+                validateFile(cipherFile);
 
-            }catch (FileNotFoundException | DeniedAccessException e){
+            }catch (FileNotFoundException | DeniedAccessException | InvalidFileFormatException e){
                 throw new FileAccessException("Unable to handle file: \"" + args[4] + "\", " + e.getMessage());
             }
         }else{
@@ -78,5 +79,17 @@ public class DecipherValidator {
             return true;
 
         return false;
+    }
+    private static void validateFile(File source) throws InvalidFileFormatException {
+        Scanner sc = null;
+        try {
+            sc = new Scanner(source);
+            while(sc.hasNextInt()){
+                Integer.parseInt(sc.next());
+            }
+        } catch (FileNotFoundException | NumberFormatException e) {
+            throw new InvalidFileFormatException("Invalid format in file \"" + source.toPath().toString() + "\", should be all integers");
+        }
+
     }
 }
