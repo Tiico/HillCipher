@@ -61,10 +61,13 @@ public class HillDecipher {
         Float64Vector column2 = Float64Vector.valueOf(c2);*/
 
         Float64Matrix keyMatrix = Float64Matrix.valueOf(vectors);
+        System.out.println(keyMatrix);
 
 
         long det = Math.floorMod(keyMatrix.determinant().longValue(), 26);
         int detInv = modInverse((int) det, 26);
+        System.out.println("Det: " + det);
+        System.out.println("Det inv: " + detInv);
         Float64Matrix adjMatrix = matrixMod(keyMatrix.adjoint(), 26);
         double a = (double) detInv;
         Float64 f = Float64.valueOf(a);

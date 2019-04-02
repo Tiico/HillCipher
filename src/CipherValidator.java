@@ -10,8 +10,8 @@ public class CipherValidator {
             //Radix
             try {
                 int radix = Integer.parseInt(args[0]);
-                if (!inRange(radix, 26, 26)){
-                    throw new OutOfRangeException("Radix value not in correct range, should be 26");
+                if (!inRange(radix, 1, 256)){
+                    throw new OutOfRangeException("Radix value not in correct range, should be between 1 and 256");
                 }
             } catch (NumberFormatException | OutOfRangeException e) {
                 throw new InvalidNumberException("Radix value error, " + e.getMessage());
@@ -20,8 +20,8 @@ public class CipherValidator {
             //Blocksize
             try {
                 int blockSize = Integer.parseInt(args[1]);
-                if (!inRange(blockSize, 3, 3)){
-                    throw new OutOfRangeException("Blocksize value not in correct range, should be 3");
+                if (!inRange(blockSize, 1, 8)){
+                    throw new OutOfRangeException("Blocksize value not in correct range, should be between 1 and 8");
                 }
             }catch (NumberFormatException | OutOfRangeException e){
                 throw new InvalidNumberException("Blocksize value error, " + e.getMessage());

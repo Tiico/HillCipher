@@ -1,5 +1,7 @@
 import Exceptions.FileAccessException;
 import Exceptions.InvalidNumberException;
+import org.jscience.mathematics.number.LargeInteger;
+import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.Float64Matrix;
 import org.jscience.mathematics.vector.Float64Vector;
 
@@ -25,20 +27,25 @@ public class HillKeys {
         final File keyOutput = new File(args[2]);
 
 
-        double[][] matrix = generateKey(radix, blockSize);
+        double[][] matrix;
+
+        do {
+            matrix = generateKey(radix, blockSize);
+            printMatrix(matrix);
+        }while (!hasInverse(matrix, radix));
 
         System.out.println("matrix");
         printMatrix(matrix);
-        writeMatrix(matrix, keyOutput);
+        writeMatrix(matrix, keyOutput, radix);
     }
-    public static void writeMatrix(double[][] matrix, File dest){
+    public static void writeMatrix(double[][] matrix, File dest, int radix){
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new FileWriter(dest));
             for (int i = 0; i < matrix[0].length; i++){
                 for (int j = 0; j < matrix.length; j++){
                     if (i >= 0 && i <= matrix[0].length && j >= 0 && j <= matrix.length) {
-                        out.write((int) matrix[j][i] % 26 + " ");
+                        out.write(((int) matrix[i][j] + " "));
                     }
                 }
                 out.newLine();
@@ -51,40 +58,38 @@ public class HillKeys {
 
     public static double[][] generateKey(int radix, int blocksize) {
         //TODO Triple-check that the keys generated actually works.
-        int[] sequence = new int[blocksize * blocksize];
         double[][] matrix = new double[blocksize][blocksize];
-        int k = 0;
 
         Random rand = new Random();
-        for (int i = 0; i < blocksize * blocksize; i++) {
-            sequence[i] = rand.nextInt(radix);
-        }
         for (int i = 0; i < blocksize; i++){
             for (int j = 0; j < blocksize; j++){
-                matrix[i][j] = sequence[k++];
+                matrix[i][j] = rand.nextInt(radix);
             }
         }
-        Float64Vector column0 = Float64Vector.valueOf(matrix[0]);
-        Float64Vector column1 = Float64Vector.valueOf(matrix[1]);
-        Float64Vector column2 = Float64Vector.valueOf(matrix[2]);
-        Float64Matrix key = Float64Matrix.valueOf(column0, column1, column2).transpose();
-
-        if (!hasInverse(key)) {
-            generateKey(radix, blocksize);
-        }
-
         return matrix;
     }
 
-    private static boolean hasInverse(Float64Matrix key) {
-        int k = 0;
-        if (!key.determinant().equals(0)){
+    private static boolean hasInverse(double[][] matrix, int radix) {
+        Float64Matrix key = Float64Matrix.valueOf(matrix);
+        int keyDet = modulo((int) Math.round((key.determinant().doubleValue())), radix);
+        if (modInverse(keyDet, radix) > 0 && keyDet != 0 ){
             System.out.println("invertible");
             return true;
         }else{
             System.out.println("not invertible");
             return false;
         }
+    }
+    public static int modulo(int x, int m){
+        return Math.floorMod((Math.floorMod(x, m) + m), m);
+    }
+    // A naive method to find modulo
+    private static int modInverse(int a, int m){
+        a = modulo(a, m);
+        for (int x = 1; x < m; x++)
+            if (modulo((a * x), m) == 1)
+                return x;
+        return -1;
     }
 
     public static void printMatrix(double[][] matrix){

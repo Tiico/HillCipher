@@ -10,7 +10,7 @@ public class DecipherValidator {
             //Radix
             try {
                 int radix = Integer.parseInt(args[0]);
-                if (!inRange(radix, 1, Integer.MAX_VALUE)){
+                if (!inRange(radix, 1, 256)){
                     throw new OutOfRangeException("Radix value not in correct range, should be non-zero and positive.");
                 }
             } catch (NumberFormatException | OutOfRangeException e) {
@@ -20,7 +20,7 @@ public class DecipherValidator {
             //Blocksize
             try {
                 int blockSize = Integer.parseInt(args[1]);
-                if (!inRange(blockSize, 3, 3)){
+                if (!inRange(blockSize, 1, 8)){
                     throw new OutOfRangeException("Blocksize value not in correct range, should be non-zero and positive.");
                 }
             }catch (NumberFormatException | OutOfRangeException e){

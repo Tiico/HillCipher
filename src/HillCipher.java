@@ -1,11 +1,14 @@
 import Exceptions.FileAccessException;
 import Exceptions.InvalidNumberException;
+import org.jscience.mathematics.vector.Float64Matrix;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class HillCipher {
+    static int radix;
+    static int blockSize;
 
     public static void main(String[] args) {
         System.out.println("Welcome to the hillcipher");
@@ -15,8 +18,8 @@ public class HillCipher {
             System.out.println("Runtime error! " + e.getMessage());
             System.exit(1);
         }
-        final int radix = Integer.parseInt(args[0]);
-        final int blockSize = Integer.parseInt(args[1]);
+        radix = Integer.parseInt(args[0]);
+        blockSize = Integer.parseInt(args[1]);
         final File keyFile = new File(args[2]);
         final File plainText = new File(args[3]);
         final File cipherText = new File(args[4]);
@@ -43,13 +46,16 @@ public class HillCipher {
         int row1 = first.length;
         int col1 = first[0].length;
         int col2 = second[0].length;
+        System.out.println(row1 + " " + col1 + " " + col2);
 
 
         for(int i = 0; i < row1; i++) {
             for (int j = 0; j < col2; j++) {
                 for (int k = 0; k < col1; k++) {
-                    product[i][j] += first[i][k] * second[k][j];
-                    product[i][j] = product[i][j] % 26;
+                    if (i >= 0 && i <= row1 && j >= 0 && j <= col2 && k < col1) {
+                        product[i][j] += first[i][k] * second[k][j];
+                        product[i][j] = product[i][j] % radix;
+                    }
                 }
             }
         }
