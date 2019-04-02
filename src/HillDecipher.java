@@ -1,5 +1,3 @@
-import Exceptions.FileAccessException;
-import Exceptions.InvalidNumberException;
 import org.jscience.mathematics.number.Float64;
 import org.jscience.mathematics.vector.Float64Matrix;
 import org.jscience.mathematics.vector.Float64Vector;
@@ -10,6 +8,9 @@ import java.util.Scanner;
 
 @SuppressWarnings("Duplicates")
 public class HillDecipher {
+    static int radix;
+    static int blockSize;
+
     public static void main(String[] args) {
         System.out.println("Welcome to the HillDecipher");
 
@@ -19,8 +20,8 @@ public class HillDecipher {
             System.out.println("Runtime error! " + e.getMessage());
         }
 
-        final int radix = Integer.parseInt(args[0]);
-        final int blockSize = Integer.parseInt(args[1]);
+        radix = Integer.parseInt(args[0]);
+        blockSize = Integer.parseInt(args[1]);
         final File keyFile = new File(args[2]);
         final File plainText = new File(args[3]);
         final File cipherText = new File(args[4]);
@@ -29,59 +30,54 @@ public class HillDecipher {
     }
 
     public static void decrypt(File keyFile, File source, File dest){
-        Object[] key = readFromFile(keyFile);
-        int[][] keyMatrix = createMatrix(key);
-        int[][] invertedMatrix = invertMatrix(keyMatrix);
+        int[] key = readFromFile(keyFile);
+        double[][] keyMatrix = createMatrix(key);
+        printMatrix(keyMatrix, "keymatrix");
+        double[][] invertedMatrix = invertMatrix(keyMatrix);
+        System.out.println("invertedMatrix");
+        System.out.println(invertedMatrix);
 
-        printMatrix(invertedMatrix, "Inverted matrix");
+        int[] numericArr = readFromFile(source);
+        double[][] cipherText = createReverseMatrix(numericArr);
+        printMatrix(cipherText, "ciphertext");
 
-        Object[] numericArr = readFromFile(source);
-        int[][] cipherText = createReverseMatrix(numericArr);
-        printMatrix(cipherText, "cipherText");
-        int[][] plainNumeric = multiplyMatrices(invertedMatrix, cipherText);
-        printMatrix(plainNumeric, "plainNumeric");
+        Float64Matrix inverted = Float64Matrix.valueOf(invertedMatrix);
+        Float64Matrix cipher = Float64Matrix.valueOf(cipherText);
+
+        Float64Matrix plainNumeric = multiplyMatrices(inverted, cipher);
+        System.out.println(plainNumeric);
 
         writeToFile(plainNumeric, dest.toPath().toString());
     }
 
-    private static int[][] invertMatrix(int[][] matrix){
-        Float64Vector vectors[] = new Float64Vector[matrix.length];
-        double[][] result = new double[matrix.length][matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                result[i][j] = (double) matrix[i][j];
-            }
-            vectors[i] = Float64Vector.valueOf(result[i]);
-        }
-/*        double[] c0 = {16, 0, 17};
-        double[] c1 = {25, 8, 6};
-        double[] c2 = {2, 9, 7};
-        Float64Vector column0 = Float64Vector.valueOf(c0);
-        Float64Vector column1 = Float64Vector.valueOf(c1);
-        Float64Vector column2 = Float64Vector.valueOf(c2);*/
-
-        Float64Matrix keyMatrix = Float64Matrix.valueOf(vectors);
+    private static double[][] invertMatrix(double[][] matrix){
+        Float64Matrix keyMatrix = Float64Matrix.valueOf(matrix);
         System.out.println(keyMatrix);
 
 
-        long det = Math.floorMod(keyMatrix.determinant().longValue(), 26);
-        int detInv = modInverse((int) det, 26);
+        long det = Math.floorMod(keyMatrix.determinant().longValue(), radix);
+        int detInv = modInverse((int) det, radix);
         System.out.println("Det: " + det);
         System.out.println("Det inv: " + detInv);
-        Float64Matrix adjMatrix = matrixMod(keyMatrix.adjoint(), 26);
+        Float64Matrix adjMatrix = matrixMod(keyMatrix.adjoint(), radix);
         double a = (double) detInv;
         Float64 f = Float64.valueOf(a);
-        Float64Matrix m = matrixMod(adjMatrix.times(f),26);
+        Float64Matrix m = matrixMod(adjMatrix.times(f),radix);
 
-        int[][] returnMatrix = new int[matrix.length][matrix.length];
+        double[][] returnMatrix = new double[matrix.length][matrix.length];
 
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
-                returnMatrix[i][j] = (int) m.get(i, j).doubleValue();
+                returnMatrix[i][j] = m.get(i, j).doubleValue();
             }
         }
         return returnMatrix;
     }
+
+    public static int modulo(int x, int m){
+        return Math.floorMod((Math.floorMod(x, m) + m), m);
+    }
+
     // A naive method to find modulo
     private static int modInverse(int a, int m){
         a = a % m;
@@ -103,15 +99,15 @@ public class HillDecipher {
         Float64Matrix m = Float64Matrix.valueOf(vectors);
         return m;
     }
-    private static int[][] createReverseMatrix(Object[] arr){
+    private static double[][] createReverseMatrix(int[] arr){
         int k = 0;
-        int row = 3;
+        int row = blockSize;
         int col = arr.length / row;
-        int[][] result = new int[row][col];
+        double[][] result = new double[row][col];
         for (int i = 0; i < col; i++){
             for (int j = 0; j < row; j++){
                 if (k >= 0 && k < arr.length) {
-                    result[j][i] = (Integer) arr[k++];
+                    result[j][i] = (double) arr[k++];
                 }else{
                     result[j][i] = 0;
                 }
@@ -120,15 +116,15 @@ public class HillDecipher {
         System.out.println();
         return result;
     }
-    public static int[][] createMatrix(Object[] arr){
+    public static double[][] createMatrix(int[] arr){
         int k = 0;
-        int row = 3;
+        int row = blockSize;
         int col = arr.length / row;
-        int[][] result = new int[row][col];
+        double[][] result = new double[row][col];
         for (int i = 0; i < row; i++){
             for (int j = 0; j < col; j++){
                 if (k >= 0 && k < arr.length) {
-                    result[i][j] = (Integer) arr[k++];
+                    result[i][j] = (double) arr[k++];
                 }else{
                     result[i][j] = 0;
                 }
@@ -136,7 +132,7 @@ public class HillDecipher {
         }
         return result;
     }
-    public static Object[] readFromFile(File source){
+    public static int[] readFromFile(File source){
         Scanner sc = null;
         try {
             sc = new Scanner(source);
@@ -148,18 +144,19 @@ public class HillDecipher {
             list.add(sc.nextInt());
         }
 
-        Object[] arr = list.toArray();
+        int[] arr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++){
+            arr[i] = list.get(i);
+        }
         return arr;
     }
-    public static void writeToFile(int[][] source, String dest){
+    public static void writeToFile(Float64Matrix source, String dest){
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new FileWriter(dest));
-            for (int i = 0; i < source[0].length; i++){
-                for (int j = 0; j < source.length; j++){
-                    if (i >= 0 && i <= source[0].length && j >= 0 && j <= source.length) {
-                        out.write(source[j][i] % 26 + " ");
-                    }
+            for (int i = 0; i < source.getNumberOfColumns(); i++){
+                for (int j = 0; j < source.getNumberOfRows(); j++){
+                    out.write((int) source.get(j, i).doubleValue() % radix + " ");
                 }
             }
             out.flush();
@@ -168,24 +165,25 @@ public class HillDecipher {
         }
     }
 
-    public static int[][] multiplyMatrices(int[][] first, int[][] second){
-        int[][] product = new int[first.length][second[0].length];
-        int row1 = first.length;
-        int col1 = first[0].length;
-        int col2 = second[0].length;
+    public static Float64Matrix multiplyMatrices(Float64Matrix first, Float64Matrix second){
+        System.out.println(first);
+        System.out.println();
+        System.out.println(second);
+        Float64Matrix temp = first.times(second);
+        double[][] arr = new double[temp.getNumberOfRows()][temp.getNumberOfColumns()];
 
-
-        for(int i = 0; i < row1; i++) {
-            for (int j = 0; j < col2; j++) {
-                for (int k = 0; k < col1; k++) {
-                    product[i][j] += first[i][k] * second[k][j];
-                    product[i][j] = product[i][j] % 26;
-                }
+        for (int i = 0; i < temp.getNumberOfRows(); i++){
+            for (int j = 0; j < temp.getNumberOfColumns(); j++){
+                arr[i][j] = modulo((int) temp.get(i, j).doubleValue(), radix);
             }
         }
-        return product;
+
+        Float64Matrix result = Float64Matrix.valueOf(arr);
+
+        return result;
+
     }
-    public static void printMatrix(int[][] matrix, String name){
+    public static void printMatrix(double[][] matrix, String name){
         System.out.println("*====" + name + "====*");
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix[i].length; j++){

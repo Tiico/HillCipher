@@ -1,5 +1,3 @@
-import Exceptions.FileAccessException;
-import Exceptions.InvalidNumberException;
 import org.jscience.mathematics.vector.Float64Matrix;
 
 import java.io.*;
@@ -27,49 +25,47 @@ public class HillCipher {
         encrypt(keyFile, plainText, cipherText);
     }
     public static void encrypt(File key, File source, File dest){
-        Object[] arr = readFromFile(source);
-        int[][] plainNumbers = createReverseMatrix(arr);
+        int[] arr = readFromFile(source);
+        double[][] plainNumbers = createReverseMatrix(arr);
         printMatrix(plainNumbers, "plainNumbers");
 
-        Object[] keyList = readFromFile(key);
-        int[][] keyMatrix = createMatrix(keyList);
+        int[] keyList = readFromFile(key);
+        double[][] keyMatrix = createMatrix(keyList);
         printMatrix(keyMatrix, "keyMatrix");
 
-        int[][] product = multiplyMatrices(keyMatrix, plainNumbers);
+        Float64Matrix p = Float64Matrix.valueOf(plainNumbers);
+        Float64Matrix k = Float64Matrix.valueOf(keyMatrix);
+        Float64Matrix product = multiplyMatrices(k, p);
 
-        printMatrix(product, "product");
+
+        System.out.println(product);
 
         writeToFile(product, dest.toPath().toString());
     }
-    public static int[][] multiplyMatrices(int[][] first, int[][] second){
-        int[][] product = new int[first.length][second[0].length];
-        int row1 = first.length;
-        int col1 = first[0].length;
-        int col2 = second[0].length;
-        System.out.println(row1 + " " + col1 + " " + col2);
+    public static Float64Matrix multiplyMatrices(Float64Matrix first, Float64Matrix second){
+        Float64Matrix temp = first.times(second);
+        double[][] arr = new double[temp.getNumberOfRows()][temp.getNumberOfColumns()];
 
-
-        for(int i = 0; i < row1; i++) {
-            for (int j = 0; j < col2; j++) {
-                for (int k = 0; k < col1; k++) {
-                    if (i >= 0 && i <= row1 && j >= 0 && j <= col2 && k < col1) {
-                        product[i][j] += first[i][k] * second[k][j];
-                        product[i][j] = product[i][j] % radix;
-                    }
-                }
+        for (int i = 0; i < temp.getNumberOfRows(); i++){
+            for (int j = 0; j < temp.getNumberOfColumns(); j++){
+                arr[i][j] = modulo((int) temp.get(i, j).doubleValue(), radix);
             }
         }
-        return product;
+
+        Float64Matrix result = Float64Matrix.valueOf(arr);
+
+        return result;
+
     }
-    public static int[][] createReverseMatrix(Object[] arr){
+    public static double[][] createReverseMatrix(int[] arr){
         int k = 0;
-        int row = 3;
+        int row = blockSize;
         int col = arr.length / row;
-        int[][] result = new int[row][col];
+        double[][] result = new double[row][col];
         for (int i = 0; i < col; i++){
             for (int j = 0; j < row; j++){
                 if (k >= 0 && k < arr.length) {
-                    result[j][i] = (Integer) arr[k++];
+                    result[j][i] = (double) arr[k++];
                 }else{
                     result[j][i] = 0;
                 }
@@ -78,15 +74,15 @@ public class HillCipher {
         System.out.println();
         return result;
     }
-    public static int[][] createMatrix(Object[] arr){
+    public static double[][] createMatrix(int[] arr){
         int k = 0;
-        int row = 3;
+        int row = blockSize;
         int col = arr.length / row;
-        int[][] result = new int[row][col];
+        double[][] result = new double[row][col];
         for (int i = 0; i < row; i++){
             for (int j = 0; j < col; j++){
                 if (k >= 0 && k < arr.length) {
-                    result[i][j] = (Integer) arr[k++];
+                    result[i][j] = (double) arr[k++];
                 }else{
                     result[i][j] = 0;
                 }
@@ -94,7 +90,11 @@ public class HillCipher {
         }
         return result;
     }
-    public static Object[] readFromFile(File source){
+    public static int modulo(int x, int m){
+        return Math.floorMod((Math.floorMod(x, m) + m), m);
+    }
+
+    public static int[] readFromFile(File source){
         Scanner sc = null;
         try {
             sc = new Scanner(source);
@@ -106,18 +106,19 @@ public class HillCipher {
             list.add(sc.nextInt());
         }
 
-        Object[] arr = list.toArray();
+        int[] arr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++){
+            arr[i] = list.get(i);
+        }
         return arr;
     }
-    public static void writeToFile(int[][] source, String dest){
+    public static void writeToFile(Float64Matrix source, String dest){
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new FileWriter(dest));
-            for (int i = 0; i < source[0].length; i++){
-                for (int j = 0; j < source.length; j++){
-                    if (i >= 0 && i <= source[0].length && j >= 0 && j <= source.length) {
-                        out.write(source[j][i] % 26 + " ");
-                    }
+            for (int i = 0; i < source.getNumberOfColumns(); i++){
+                for (int j = 0; j < source.getNumberOfRows(); j++){
+                        out.write((int) source.get(j, i).doubleValue() % radix + " ");
                 }
             }
             out.flush();
@@ -125,7 +126,7 @@ public class HillCipher {
             e.printStackTrace();
         }
     }
-    public static void printMatrix(int[][] matrix, String name){
+    public static void printMatrix(double[][] matrix, String name){
         System.out.println("*====" + name + "====*");
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix[i].length; j++){
